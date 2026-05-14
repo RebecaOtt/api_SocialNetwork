@@ -1,11 +1,18 @@
 package com.apiteach.socialNetwork.model;
+import com.apiteach.socialNetwork.domain.Role;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @Column(nullable = false, unique = true)
     private String username;
@@ -27,6 +34,34 @@ public class User {
     private String mail;
 
     private String profileLink;
+
+    @ElementCollection(fetch = FetchType.EAGER, targetClass = Role.class)
+    @Enumerated(EnumType.STRING)
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_username"))
+    @Column(name = "role_name")
+    private List<Role> roles = new ArrayList<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.name()));
+        }
+
+        return authorities;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    @OneToMany(mappedBy = "user")
+    private List<Post> posts = new ArrayList<>();
 
     public String getUsername() {
         return username;
@@ -103,7 +138,6 @@ public class User {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDate.now();
-        this.updatedAt = LocalDate.now();
     }
 
     @PreUpdate

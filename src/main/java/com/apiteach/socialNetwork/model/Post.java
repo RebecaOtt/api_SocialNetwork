@@ -16,7 +16,7 @@ public class Post {
     private LocalDate updatedAt;
 
     @Column(nullable = false, length = 50)
-    private String tite;
+    private String title;
 
     @Column(nullable = false, length = 200)
     private String description;
@@ -25,36 +25,12 @@ public class Post {
     private String videoLink;
     private Boolean privy;
 
-    public Boolean getDeleted() {
-        return deleted;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDate getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDate updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getTite() {
-        return tite;
-    }
-
-    public void setTite(String tite) {
-        this.tite = tite;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -99,4 +75,8 @@ public class Post {
     protected void onUpdate() {
         this.updatedAt = LocalDate.now();
     }
+
+    @ManyToOne
+    @JoinColumn(name = "user_username")
+    private User user;
 }

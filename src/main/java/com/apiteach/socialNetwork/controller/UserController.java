@@ -1,12 +1,13 @@
 package com.apiteach.socialNetwork.controller;
 
+import com.apiteach.socialNetwork.dto.req.LoginReqDTO;
 import com.apiteach.socialNetwork.dto.req.UserPatchDTOReq;
 import com.apiteach.socialNetwork.dto.req.UserReqDTO;
+import com.apiteach.socialNetwork.dto.res.LoginResDTO;
 import com.apiteach.socialNetwork.dto.res.UserResDTO;
 import com.apiteach.socialNetwork.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,5 +38,11 @@ public class UserController {
     public ResponseEntity<List<UserResDTO>> findAllUsers() {
         List<UserResDTO> list = this.userService.findAllUsers();
         return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/login")
+    public LoginResDTO login(@RequestBody LoginReqDTO dto){
+        LoginResDTO response = userService.login(dto);
+        return response;
     }
 }

@@ -19,6 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private SecurityFilter securityFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
         return security
@@ -28,6 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/users/{username}").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/users/{username}").permitAll()
@@ -35,11 +39,17 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception{
+        return configuration.getAuthenticationManager();
     }
 }
