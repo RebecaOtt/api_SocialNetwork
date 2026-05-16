@@ -27,5 +27,8 @@ public class GlobalExceprionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTOReq(HttpStatus.NOT_FOUND, e.getMessage()));
     }
 
-
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ExceptionDTOReq> handleUnauthorized(UnauthorizedAccessException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ExceptionDTOReq(HttpStatus.FORBIDDEN, e.getMessage()));
+    }
 }

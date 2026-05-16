@@ -11,7 +11,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Boolean deleted;
+    private Boolean deleted = false;
     private LocalDate createdAt;
     private LocalDate updatedAt;
 
@@ -23,7 +23,38 @@ public class Post {
 
     private String photoLink;
     private String videoLink;
+
+    @Column(nullable = false)
     private Boolean privy;
+
+    public Post() {
+    }
+
+    public Post(String title, String description, String photoLink, String videoLink, Boolean privy) {
+        this.title = title;
+        this.description = description;
+        this.photoLink = photoLink;
+        this.videoLink = videoLink;
+        this.privy = privy;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public Long getId() { return id; }
 
     public String getTitle() {
         return title;
@@ -65,10 +96,17 @@ public class Post {
         this.privy = privy;
     }
 
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDate.now();
-        this.updatedAt = LocalDate.now();
     }
 
     @PreUpdate

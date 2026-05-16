@@ -9,6 +9,7 @@ import com.apiteach.socialNetwork.dto.res.UserResDTO;
 import com.apiteach.socialNetwork.exception.InvalidParamException;
 import com.apiteach.socialNetwork.exception.ResourceAlreadyExistsException;
 import com.apiteach.socialNetwork.exception.ResourceNotFoundException;
+import com.apiteach.socialNetwork.exception.UnauthorizedAccessException;
 import com.apiteach.socialNetwork.model.User;
 import com.apiteach.socialNetwork.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,11 +83,14 @@ public class UserService {
         return UserResDTO.ModelToDTO(updatedUser);
     }
 
-    public void deleteUser(String username) {
-        User user = findByIdEntity(username);
+    public void deleteUser(String username, String user) {
+        if (!user.equals(username))
+            throw new UnauthorizedAccessException("You do not have permission to delete this account");
 
-        user.setDeleted(true);
-        userRepository.save(user);
+        User userDeleted = findByIdEntity(username);
+
+        userDeleted.setDeleted(true);
+        userRepository.save(userDeleted);
     }
 
     public List<UserResDTO> findAllUsers() {

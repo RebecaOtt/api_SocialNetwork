@@ -5,9 +5,11 @@ import com.apiteach.socialNetwork.dto.req.UserPatchDTOReq;
 import com.apiteach.socialNetwork.dto.req.UserReqDTO;
 import com.apiteach.socialNetwork.dto.res.LoginResDTO;
 import com.apiteach.socialNetwork.dto.res.UserResDTO;
+import com.apiteach.socialNetwork.model.User;
 import com.apiteach.socialNetwork.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,8 +32,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{username}")
-    public void deleteUser(@PathVariable String username) {
-        userService.deleteUser(username);
+    public ResponseEntity<Void> deleteUser(@PathVariable String username, @AuthenticationPrincipal
+                           User user) {
+        this.userService.deleteUser(username, user.getUsername());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
