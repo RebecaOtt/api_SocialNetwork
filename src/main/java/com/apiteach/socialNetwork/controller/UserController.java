@@ -27,8 +27,9 @@ public class UserController {
     }
 
     @PatchMapping("/{username}")
-    public UserResDTO updateUser(@PathVariable String username, @RequestBody UserPatchDTOReq dto) {
-        return userService.updateUser(username, dto);
+    public UserResDTO updateUser(@PathVariable String username, @RequestBody UserPatchDTOReq dto, @AuthenticationPrincipal
+    User user) {
+        return userService.updateUser(username, dto, user.getUsername());
     }
 
     @DeleteMapping("/{username}")

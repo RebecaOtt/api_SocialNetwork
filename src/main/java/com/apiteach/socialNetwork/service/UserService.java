@@ -37,7 +37,13 @@ public class UserService {
 
     public UserResDTO createUser(UserReqDTO dto) {
         validateLogin(dto.username(), dto.password());
-        validateMailAndName(dto.mail(), dto.name());
+
+        if (dto.mail() == null || dto.mail().isEmpty())
+            throw new InvalidParamException("Email cannot be null or empty");
+        if (dto.name() == null || dto.name().isEmpty())
+            throw new InvalidParamException("Name cannot be null or empty");
+        if (!dto.mail().contains("@"))
+            throw new InvalidParamException("Invalid email: must contain @");
         if (userRepository.existsByUsernameAndDeletedFalse(dto.username()))
             throw new ResourceAlreadyExistsException("username already in use");
         if (userRepository.existsByMailAndDeletedFalse(dto.mail()))
@@ -62,7 +68,8 @@ public class UserService {
         return UserResDTO.ModelToDTO(savedUser);
     }
 
-    public UserResDTO updateUser(String username, UserPatchDTOReq dto) {
+    public UserResDTO updateUser(String username, UserPatchDTOReq dto, String userUsername) {
+        this.validateUser(username, userUsername);
         User user = findByIdEntity(username);
 
         if (dto.mail() != null && !dto.mail().equals(user.getMail())) {
@@ -84,8 +91,7 @@ public class UserService {
     }
 
     public void deleteUser(String username, String user) {
-        if (!user.equals(username))
-            throw new UnauthorizedAccessException("You do not have permission to delete this account");
+        this.validateUser(username, user);
 
         User userDeleted = findByIdEntity(username);
 
@@ -115,22 +121,19 @@ public class UserService {
 
     private void validateLogin(String username, String password) {
         if (username == null || username.isEmpty())
-            throw  new InvalidParamException("Username cannot be null or empty");
+            throw new InvalidParamException("Username cannot be null or empty");
         if (password == null || password.isEmpty())
             throw new InvalidParamException("Password cannot be null or empty");
     }
 
-    private void validateMailAndName(String email, String name){
-        if (email == null || email.isEmpty())
-            throw new InvalidParamException("Email cannot be null or empty");
-        if (name == null || name.isEmpty())
-            throw  new InvalidParamException("Name cannot be null or empty");
-        if (!email.contains("@"))
-            throw new InvalidParamException("Invalid email: must contain @");
-    }
-
-    private User findByIdEntity(String username){
+    private User findByIdEntity(String username) {
         return this.userRepository.findByUsernameAndDeletedFalse(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found or already deleted!!"));
     }
+
+    private void validateUser(String username, String user) {
+        if (!user.equals(username))
+            throw new UnauthorizedAccessException("You do not have permission");
+    }
+
 }
